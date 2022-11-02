@@ -46,3 +46,14 @@ while true do
     transactions <- (transferWithFileAudit logFile) myAccount shopAccount amount transactions
     // transactions <- transferWithConsoleAudit myAccount shopAccount amount transactions
     printfn ""
+    
+(*
+Ideally, I'd want to apply a pattern similar to this:
+
+let transactions =
+    transactionsStart
+    |> transfer myAccount shopAccount 10
+    |> transfer myAccount shopAccount 50
+    |> transfer myAccount shopAccount 30 // 10 remaining
+    |> transfer employerAccount myAccount 500 // 510 remaining
+*)    
