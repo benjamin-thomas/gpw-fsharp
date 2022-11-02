@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain.fs" />
+    <Compile Include="Operations.fs" />
+    <Compile Include="Audit.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
