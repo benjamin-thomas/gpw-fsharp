@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Program.fs" />
-    <None Include="Collections\Football.fsx" />
+    <None Include="Collections\List.fsx" />
     <None Include="FirstLessons\Petrol.fsx" />
     <None Include="FirstLessons\Customer.fsx" />
   </ItemGroup>
