@@ -14,11 +14,12 @@ type Summary =
         ParentDir: string
     }
 
-let private addTrailingSlash (str: string) : string =
-    if str.EndsWith "/" then
+let private addTrailingSepChar (str: string) : string =
+    let sepChar = System.IO.Path.DirectorySeparatorChar.ToString()
+    if str.EndsWith sepChar then
         str
     else
-        str + "/"
+        str + sepChar
 
 let rec toSummary path =
     let fi = System.IO.FileInfo path
@@ -46,7 +47,7 @@ let rec toSummary path =
             IsHidden = isHidden
             Size = size
             Children = children
-            ParentDir = fi.DirectoryName |> addTrailingSlash
+            ParentDir = fi.DirectoryName |> addTrailingSepChar
         }
     ]
 
@@ -87,12 +88,12 @@ let private printPath (depth, size: int64, path: string, isDir, parentDir) =
     let depthToWS = String.replicate depth "  "
 
     let simplePath = path.Replace(parentDir, "")
-    let fileEmoji = if isDir then "📁" else "📝"
+    let fileTypeEmoji = if isDir then "📁" else "📝"
     let depth_ = $"%d{depth}".PadLeft(3)
-    printfn $"[%s{(toHuman size).PadLeft(9)}] %s{fileEmoji} [%s{depth_}] %s{depthToWS} %s{simplePath}"
+    printfn $"[%s{(toHuman size).PadLeft(9)}] %s{fileTypeEmoji} [%s{depth_}] %s{depthToWS} %s{simplePath}"
 
 let print rootPath =
-    compute (rootPath |> addTrailingSlash)
+    compute (rootPath |> addTrailingSepChar)
     |> treeToString 0
     |> Seq.sortBy (fun (depth, _size, path, _isDir, _parentDir) -> [ path.ToLower(), depth ]) // sort lower to mimic os util "tree"
     |> Seq.iter printPath
