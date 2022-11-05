@@ -12,7 +12,6 @@
 [<EntryPoint>]
 let main args =
     if args.Length = 0 then
-        // Tree.print "/home/benjamin/code/explore/love2d/love-typescript-template/"
         printfn "Must provide a path!"
     else
         let path = args[0]
