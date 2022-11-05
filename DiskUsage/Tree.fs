@@ -57,10 +57,9 @@ let rec treeToString (depth: int) (summary: Summary seq) : (int * int64 * string
     |> Seq.collect (fun summary ->
         let children: Summary seq = summary.Children
 
-        // FIXME: bogus -1 value here. I need to somehow accumulate summary.Size from the children.
         if children <> [] then
             [
-                (depth, int64 -1, summary.Name, summary.IsDir, summary.ParentDir)
+                (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
             ]
             |> Seq.append (treeToString (depth + 1) children |> Seq.map id)
 
