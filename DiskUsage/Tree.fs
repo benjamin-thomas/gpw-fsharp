@@ -81,8 +81,8 @@ let private toHuman size =
 
     $"[%s{sizeToHuman}]".PadRight(10)
 
-let print start =
-    compute (start |> addTrailingSlash)
+let print path =
+    compute (path |> addTrailingSlash)
     |> treeToString 0
     |> Seq.iter (fun (depth, size, path) ->
         let depthToWS = String.replicate depth "  "
