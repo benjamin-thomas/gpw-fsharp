@@ -59,7 +59,7 @@ let rec treeToString (depth: int) (summary: Summary seq) : (int * int64 * string
         // FIXME: bogus -1 value here. I need to somehow accumulate summary.Size from the children.
         if children <> [] then
             [
-                (depth, int64 (-1), summary.Name, summary.IsDir, summary.ParentDir)
+                (depth, int64 -1, summary.Name, summary.IsDir, summary.ParentDir)
             ]
             |> Seq.append (treeToString (depth + 1) children |> Seq.map id)
 
@@ -83,7 +83,7 @@ let private toHuman size =
         .ToString()
 
 
-let private printPath rootPath (depth, size: int64, path: string, isDir, parentDir) =
+let private printPath (depth, size: int64, path: string, isDir, parentDir) =
     let depthToWS = String.replicate depth "  "
 
     let simplePath = path.Replace(parentDir, "")
@@ -95,6 +95,6 @@ let print rootPath =
     compute (rootPath |> addTrailingSlash)
     |> treeToString 0
     |> Seq.sortBy (fun (depth, _size, path, _isDir, _parentDir) -> [ path.ToLower(), depth ]) // sort lower to mimic os util "tree"
-    |> Seq.iter (printPath rootPath)
+    |> Seq.iter printPath
 
 // print "/home/benjamin/code/explore/love2d/love-typescript-template/"
