@@ -10,4 +10,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ByteSize" Version="2.1.1" />
+  </ItemGroup>
+
 </Project>

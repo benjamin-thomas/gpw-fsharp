@@ -1,7 +1,5 @@
 module Tree
 
-open System
-
 let enumEntries path =
     System.IO.Directory.EnumerateFileSystemEntries path
 
@@ -10,6 +8,8 @@ type Summary =
     {
         Name: string
         IsDir: bool
+        IsHidden: bool
+        Size: int64
         Children: Summary seq
     }
 
@@ -17,7 +17,14 @@ let rec toSummary start path =
     let fi = System.IO.FileInfo path
 
     let isDir =
-        fi.Attributes = IO.FileAttributes.Directory
+        fi.Attributes.HasFlag(System.IO.FileAttributes.Directory)
+
+    let isHidden =
+        fi.Attributes.HasFlag(System.IO.FileAttributes.Hidden)
+
+    // Return 0 or get a runtime error (data does not exist).
+    let size =
+        if isDir then int64 0 else fi.Length
 
     let getChildren =
         if isDir then
@@ -28,11 +35,13 @@ let rec toSummary start path =
     {
         Name = path.Replace(start, "")
         IsDir = isDir
+        IsHidden = isHidden
+        Size = size
         Children = getChildren
     }
 
 
-let rec treeToString (summary: Summary seq) : string seq =
+let rec treeToString (depth: int) (summary: Summary seq) : (int * int64 * string) seq =
     summary
     |> Seq.collect (fun summary ->
         let children: Summary seq = summary.Children
@@ -40,13 +49,12 @@ let rec treeToString (summary: Summary seq) : string seq =
         // I need to groupBy the parent name
         // FIXME: empty directories are not shown
         if children <> [] then
-            treeToString children
-            |> Seq.map (fun path -> $"  %s{path}")
+            treeToString (depth + 1) children |> Seq.map id
 
         else
-            [ summary.Name ])
+            [ (depth, summary.Size, summary.Name) ])
 
-let hiddenFile summary = summary.Name.StartsWith "."
+let hiddenFile summary = summary.IsHidden
 
 let toLowerName summary = summary.Name.ToLower()
 
@@ -64,9 +72,21 @@ let private addTrailingSlash (str: string) : string =
     else
         str + "/"
 
+let private toHuman size =
+    let sizeToHuman =
+        ByteSizeLib
+            .ByteSize
+            .FromBytes(float size)
+            .ToString()
+
+    $"[%s{sizeToHuman}]".PadRight(10)
+
 let print start =
     compute (start |> addTrailingSlash)
-    |> treeToString
-    |> Seq.iter Console.WriteLine
+    |> treeToString 0
+    |> Seq.iter (fun (depth, size, path) ->
+        let depthToWS = String.replicate depth "  "
 
-// printTree "/home/benjamin/code/explore/love2d/love-typescript-template/" ()
+        printfn $"%s{depthToWS} %s{toHuman size} %s{path}")
+
+// print "/home/benjamin/code/explore/love2d/love-typescript-template/"
