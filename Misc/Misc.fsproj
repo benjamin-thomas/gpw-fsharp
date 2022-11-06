@@ -12,6 +12,8 @@
     <None Include="Collections\Common.fsx" />
     <None Include="FirstLessons\Petrol.fsx" />
     <None Include="FirstLessons\Customer.fsx" />
+    <None Include="Maps_Dicts_Sets\Play.fsx" />
+    <None Include="Maps_Dicts_Sets\DirectoryListing.fsx" />
   </ItemGroup>
 
 </Project>
