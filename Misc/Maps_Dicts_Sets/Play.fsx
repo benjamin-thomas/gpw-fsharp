@@ -55,3 +55,56 @@ let inventory5 =
     inventory4
     |> Map.remove "Apples"
     |> Map.add "Pears" 4
+
+// Sets
+let myBasket =
+    [
+        "Apple"
+        "Apple"
+        "Orange"
+        "Banana"
+        "Pineapple"
+    ]
+
+let fruitsILike =
+    // No dups
+    myBasket |> Set.ofList // set ["Apple"; "Banana"; "Orange"; "Pineapple"]
+
+let yourBasket =
+    [ "Kiwi"; "Banana"; "Grapes" ]
+
+let fruitsYouLike =
+    // No dups
+    yourBasket |> Set.ofList // set ["Banana"; "Grapes"; "Kiwi"]
+
+let allFruitsList =
+    // ["Apple"; "Orange"; "Banana"; "Pineapple"; "Kiwi"; "Grapes"]
+    (myBasket @ yourBasket) |> List.distinct
+
+let allFruits = fruitsILike + fruitsYouLike // set ["Apple"; "Banana"; "Grapes"; "Kiwi"; "Orange"; "Pineapple"]
+
+let allFruits2 =
+    Set.union fruitsILike fruitsYouLike // set ["Apple"; "Banana"; "Grapes"; "Kiwi"; "Orange"; "Pineapple"]
+
+let fruitsOnlyLikedByMe =
+    allFruits - fruitsYouLike // set ["Apple"; "Orange"; "Pineapple"]
+
+let fruitsOnlyLikedByMe2 =
+    Set.difference allFruits fruitsYouLike // set ["Apple"; "Orange"; "Pineapple"]
+
+let fruitsOnlyLikedByYou =
+    allFruits - fruitsILike // set ["Grapes"; "Kiwi"]
+
+let fruitsOnlyLikedByYou2 =
+    Set.difference allFruits fruitsILike // set ["Grapes"; "Kiwi"]
+
+let fruitsWeBothLike =
+    Set.intersect fruitsILike fruitsYouLike // set ["Banana"]
+
+Set.isSubset (set [ 1; 2; 3 ]) (set [ 1; 2; 3; 4 ]) // true
+Set.isSubset (set [ 1; 2; 3; 4 ]) (set [ 1; 2; 3 ]) // false
+set [ 1..100 ] |> Set.isSubset (set [ 1..3 ]) // true
+
+set [ 1..100 ] |> Set.isSubset (set [ 4; 8; 16 ]) // true
+set [ 1..100 ] |> Set.isSubset (set [ 99..100 ]) // true
+set [ 1..100 ] |> Set.isSubset (set [ 99..101 ]) // false
