@@ -15,7 +15,9 @@ type Summary =
     }
 
 let private addTrailingSepChar (str: string) : string =
-    let sepChar = System.IO.Path.DirectorySeparatorChar.ToString()
+    let sepChar =
+        System.IO.Path.DirectorySeparatorChar.ToString()
+
     if str.EndsWith sepChar then
         str
     else
@@ -87,7 +89,10 @@ let private printPath (depth, size: int64, path: string, isDir, parentDir) =
     let depthToWS = String.replicate depth "  "
 
     let simplePath = path.Replace(parentDir, "")
-    let fileTypeEmoji = if isDir then "📁" else "📝"
+
+    let fileTypeEmoji =
+        if isDir then "📁" else "📝"
+
     let depth_ = $"%d{depth}".PadLeft(3)
     printfn $"[%s{(toHuman size).PadLeft(9)}] %s{fileTypeEmoji} [%s{depth_}] %s{depthToWS} %s{simplePath}"
 
