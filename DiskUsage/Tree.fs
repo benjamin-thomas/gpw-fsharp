@@ -9,6 +9,7 @@ type Summary =
         Name: string
         IsDir: bool
         IsHidden: bool
+        IsLink: bool
         Size: int64
         Children: Summary seq
         ParentDir: string
@@ -31,13 +32,15 @@ let rec toSummary path =
 
     let isHidden =
         fi.Attributes.HasFlag(System.IO.FileAttributes.Hidden)
+        
+    let isLink = fi.LinkTarget = null |> not
 
     // Return 0 or get a runtime error (data does not exist).
     let size =
         if isDir then int64 0 else fi.Length
 
     let children =
-        if isDir then
+        if isDir && not isLink then
             (enumEntries path |> Seq.collect toSummary)
         else
             []
@@ -47,6 +50,7 @@ let rec toSummary path =
             Name = path
             IsDir = isDir
             IsHidden = isHidden
+            IsLink = isLink
             Size = size
             Children = children
             ParentDir = fi.DirectoryName |> addTrailingSepChar
