@@ -1,7 +1,7 @@
 module Tree
 
 let enumEntries path =
-    System.IO.Directory.EnumerateFileSystemEntries path
+    System.IO.Directory.EnumerateFileSystemEntries path |> Seq.toList
 
 
 type Summary =
@@ -11,7 +11,7 @@ type Summary =
         IsHidden: bool
         IsLink: bool
         Size: int64
-        Children: Summary seq
+        Children: Summary list
         ParentDir: string
     }
 
@@ -41,7 +41,7 @@ let rec toSummary path =
 
     let children =
         if isDir && not isLink then
-            (enumEntries path |> Seq.collect toSummary)
+            (enumEntries path |> List.collect toSummary)
         else
             []
 
@@ -57,17 +57,17 @@ let rec toSummary path =
         }
     ]
 
-let rec treeToString (depth: int) (summary: Summary seq) : (int * int64 * string * bool * string) seq =
+let rec treeToString (depth: int) (summary: Summary list) : (int * int64 * string * bool * string) list =
     summary
-    |> Seq.filter (fun s -> not s.IsHidden) // mimic os util: "tree"
-    |> Seq.collect (fun summary ->
-        let children: Summary seq = summary.Children
+    |> List.filter (fun s -> not s.IsHidden) // mimic os util: "tree"
+    |> List.collect (fun summary ->
+        let children: Summary list = summary.Children
 
         if children <> [] then
             [
                 (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
             ]
-            |> Seq.append (treeToString (depth + 1) children |> Seq.map id)
+            |> List.append (treeToString (depth + 1) children |> List.map id)
 
         else
             [
@@ -79,7 +79,7 @@ let hiddenFile summary = summary.IsHidden
 let toLowerName summary = summary.Name.ToLower()
 
 let compute path =
-    enumEntries path |> Seq.collect toSummary
+    enumEntries path |> List.collect toSummary
 
 
 let private toHuman size =
@@ -103,7 +103,5 @@ let private printPath (depth, size: int64, path: string, isDir, parentDir) =
 let print rootPath =
     compute (rootPath |> addTrailingSepChar)
     |> treeToString 0
-    |> Seq.sortBy (fun (depth, _size, path, _isDir, _parentDir) -> [ path.ToLower(), depth ]) // sort lower to mimic os util "tree"
-    |> Seq.iter printPath
-
-// print "/home/benjamin/code/explore/love2d/love-typescript-template/"
+    |> List.sortBy (fun (depth, _size, path, _isDir, _parentDir) -> [ path.ToLower(), depth ]) // sort lower to mimic os util "tree"
+    |> List.iter printPath
