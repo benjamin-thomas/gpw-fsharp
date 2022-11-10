@@ -60,8 +60,8 @@ let rec toSummary path =
         }
     ]
 
-let rec treeToString (depth: int) (summary: Summary list) : (int * int64 * string * bool * string) list =
-    summary
+let rec summaryListToData (depth: int) (summaryList: Summary list) : (int * int64 * string * bool * string) list =
+    summaryList
     |> List.filter (fun s -> not s.IsHidden) // mimic os util: "tree"
     |> List.collect (fun summary ->
         let children: Summary list = summary.Children
@@ -70,7 +70,7 @@ let rec treeToString (depth: int) (summary: Summary list) : (int * int64 * strin
             [
                 (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
             ]
-            |> List.append (treeToString (depth + 1) children |> List.map id)
+            |> List.append (summaryListToData (depth + 1) children |> List.map id)
 
         else
             [
@@ -81,7 +81,7 @@ let hiddenFile summary = summary.IsHidden
 
 let toLowerName summary = summary.Name.ToLower()
 
-let compute path =
+let pathToSummaryList path =
     enumEntries path |> List.collect toSummary
 
 
@@ -104,7 +104,7 @@ let private printPath (depth, size: int64, path: string, isDir, parentDir) =
     printfn $"[%s{(toHuman size).PadLeft(9)}] %s{fileTypeEmoji} [%s{depth_}] %s{depthToWS} %s{simplePath}"
 
 let print rootPath =
-    compute (rootPath |> addTrailingSepChar)
-    |> treeToString 0
+    pathToSummaryList (rootPath |> addTrailingSepChar)
+    |> summaryListToData 0
     |> List.sortBy (fun (depth, _size, path, _isDir, _parentDir) -> [ path.ToLower(), depth ]) // sort lower to mimic os util "tree"
     |> List.iter printPath
