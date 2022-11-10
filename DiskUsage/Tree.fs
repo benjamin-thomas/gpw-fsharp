@@ -24,7 +24,10 @@ let private addTrailingSepChar (str: string) : string =
     else
         str + sepChar
 
+let mutable calls = 0
 let rec toSummary path =
+    calls <- calls + 1
+    printfn $"CALLS: %d{calls}"
     let fi = System.IO.FileInfo path
 
     let isDir =
@@ -38,8 +41,8 @@ let rec toSummary path =
     // Return 0 or get a runtime error (data does not exist).
     let size =
         if isDir then int64 0 else fi.Length
-
-    let children =
+        
+    let rec children =
         if isDir && not isLink then
             (enumEntries path |> List.collect toSummary)
         else
