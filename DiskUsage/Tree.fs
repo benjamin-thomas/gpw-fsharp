@@ -1,7 +1,8 @@
 module Tree
 
 let enumEntries path =
-    System.IO.Directory.EnumerateFileSystemEntries path |> Seq.toList
+    System.IO.Directory.GetFileSystemEntries path
+    |> Array.toList
 
 
 type Summary =
@@ -25,6 +26,7 @@ let private addTrailingSepChar (str: string) : string =
         str + sepChar
 
 let mutable calls = 0
+
 let rec toSummary path =
     calls <- calls + 1
     printfn $"CALLS: %d{calls}"
@@ -35,14 +37,14 @@ let rec toSummary path =
 
     let isHidden =
         fi.Attributes.HasFlag(System.IO.FileAttributes.Hidden)
-        
+
     let isLink = fi.LinkTarget = null |> not
 
     // Return 0 or get a runtime error (data does not exist).
     let size =
         if isDir then int64 0 else fi.Length
-        
-    let rec children =
+
+    let children =
         if isDir && not isLink then
             (enumEntries path |> List.collect toSummary)
         else
@@ -66,7 +68,7 @@ let rec summaryListToData (depth: int) (summaryList: Summary list) : (int * int6
     |> List.collect (fun summary ->
         let children: Summary list = summary.Children
 
-        if children <> [] then
+        if not (List.isEmpty children) then
             [
                 (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
             ]
@@ -74,7 +76,7 @@ let rec summaryListToData (depth: int) (summaryList: Summary list) : (int * int6
 
         else
             [
-                (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
+            (depth, summary.Size, summary.Name, summary.IsDir, summary.ParentDir)
             ])
 
 let hiddenFile summary = summary.IsHidden
