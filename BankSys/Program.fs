@@ -28,6 +28,7 @@ let transactionsStart: Transaction list = []
 let rec getAmount () =
     printf "How much did you spend on groceries? "
     let line = System.Console.ReadLine()
+
     match System.Int32.TryParse line with
     | true, n -> n
     | _ ->
@@ -41,12 +42,13 @@ System.IO.File.Delete(logFile)
 
 // START
 let mutable transactions = transactionsStart
+
 while true do
     let amount = getAmount ()
     transactions <- (transferWithFileAudit logFile) myAccount shopAccount amount transactions
     // transactions <- transferWithConsoleAudit myAccount shopAccount amount transactions
     printfn ""
-    
+
 (*
 Ideally, I'd want to apply a pattern similar to this:
 
@@ -56,4 +58,4 @@ let transactions =
     |> transfer myAccount shopAccount 50
     |> transfer myAccount shopAccount 30 // 10 remaining
     |> transfer employerAccount myAccount 500 // 510 remaining
-*)    
+*)
